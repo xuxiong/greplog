@@ -18,6 +18,7 @@ class grep:
         if offset >= 0:
           file.seek(offset)
           lines = self.grephead(file, limit, p, before, after)      
+          here = file.tell()      
         else:
           file.seek(0, 2)
           delta = 0
@@ -25,7 +26,8 @@ class grep:
           while len(lines) < limit:
             if offset+file.tell() < 0: offset = -1*file.tell()
             file.seek(offset, 1)
-            if file.tell() == 0:
+            here = file.tell()
+            if here == 0:
               allread = True
             str = file.read(abs(offset+delta))
             strio = cStringIO.StringIO(str)
@@ -35,8 +37,7 @@ class grep:
             delta = len(str)
             if len(lines) > 0: offset *= limit/len(lines)
             else: offset *= limit
-        offset = file.tell()      
-        return offset, lines
+        return here, lines
         
   def grephead(self, file, limit, p, before, after):
     lines = []
