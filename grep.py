@@ -155,21 +155,21 @@ class grep2:
     lines = []
     linesbefore = []
     i = 0
-    while i < limit:
-      rlines = reversed_lines(file)
-      for line in rlines:
-        if before > 0:
-          if len(linesbefore) > before: linesbefore.pop(0)
-          linesbefore.append(line)
-        if p is None or re.search(p, line): 
-          if len(linesbefore) > 1: 
-            lines.append(linesbefore[:-1])
-            linesbefore = []
-          lines.append((i, line))
-          i += 1
-          for j in xrange(after):
-            line = rlines.next()
-            lines.append(line)
+    rlines = reversed_lines(file)
+    for line in rlines:
+      if i >= limit: break
+      if before > 0:
+        if len(linesbefore) > before: linesbefore.pop(0)
+        linesbefore.append(line)
+      if p is None or re.search(p, line): 
+        if len(linesbefore) > 1: 
+          lines.append(linesbefore[:-1])
+          linesbefore = []
+        lines.append((i, line))
+        i += 1
+        for j in xrange(after):
+          line = rlines.next()
+          lines.append(line)
     return lines    
   
 def reversed_lines(file):
@@ -185,7 +185,6 @@ def reversed_lines(file):
 
 def reversed_blocks(file, blocksize=4096):
     "Generate blocks of file's contents in reverse order."
-    #file.seek(0, os.SEEK_END)
     here = file.tell()
     while 0 < here:
         delta = min(blocksize, here)
@@ -206,11 +205,11 @@ class grepHandler:
 app = web.application(urls, globals())
 
 if __name__ == "__main__":
-  app.run()
-  '''
-  g = grep('grep.txt')
+  #app.run()
+  
+  g = grep2('grep.txt')
   offset, lines = g.greplines(offset=-1, pattern='', limit=5)
   print offset, len(lines), lines
   offset, lines = g.greplines(offset=0, pattern='', limit=5)
   print offset, len(lines), lines  
-  '''
+  
