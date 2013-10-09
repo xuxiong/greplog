@@ -156,20 +156,23 @@ class grep2:
     linesbefore = []
     i = 0
     rlines = reversed_lines(file)
-    for line in rlines:
-      if i >= limit: break
-      if before > 0:
-        if len(linesbefore) > before: linesbefore.pop(0)
-        linesbefore.append(line)
-      if p is None or re.search(p, line): 
-        if len(linesbefore) > 1: 
-          lines.append(linesbefore[:-1])
-          linesbefore = []
-        lines.append((i, line))
-        i += 1
-        for j in xrange(after):
-          line = rlines.next()
-          lines.append(line)
+    try:
+      for line in rlines:
+        if i >= limit: break
+        if before > 0:
+          if len(linesbefore) > before: linesbefore.pop(0)
+          linesbefore.append(line)
+        if p is None or re.search(p, line): 
+          if len(linesbefore) > 1: 
+            lines.append(linesbefore[:-1])
+            linesbefore = []
+          lines.append((i, line))
+          i += 1
+          for j in xrange(after):
+            line = rlines.next()
+            lines.append(line)
+    except StopIteration:
+      pass	
     return lines    
   
 def reversed_lines(file):
@@ -205,11 +208,11 @@ class grepHandler:
 app = web.application(urls, globals())
 
 if __name__ == "__main__":
-  #app.run()
-  
+  app.run()
+  '''
   g = grep2('grep.txt')
   offset, lines = g.greplines(offset=-1, pattern='', limit=5)
   print offset, len(lines), lines
   offset, lines = g.greplines(offset=0, pattern='', limit=5)
   print offset, len(lines), lines  
-  
+  '''
