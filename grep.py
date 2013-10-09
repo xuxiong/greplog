@@ -1,5 +1,5 @@
 #coding=utf-8
-import os, re
+import os, re, sys
 import cStringIO
 
 class grep:
@@ -97,17 +97,31 @@ def reversed_blocks(file, blocksize=4096):
         
 import web
 
-urls = ('/grep', 'grepHandler')
+urls = ('/grep', 'grepHandler', '/ls', 'lsHandler')
 
 class grepHandler:
   def GET(self):
     req = web.input(pattern=None, offset='0', limit='10', before='0', after='0')
-    g = grep(req.filename)
-    return g.greplines(offset=int(req.offset), pattern=req.pattern, limit=int(req.limit), after=int(req.after))
-    
+    if req.filename.find('/') < 0:
+      g = grep(logdir+req.filename)
+      return g.greplines(offset=int(req.offset), pattern=req.pattern, limit=int(req.limit), after=int(req.after))
+
+class lsHandler:
+  def GET(self):
+    result = []
+    for f in [f for f in os.listdir(logdir) if os.path.isfile(f)]:
+      stat = os.stat(f)
+      result.append((f, stat[6], stat[8]))
+    return result
+          
 app = web.application(urls, globals())
 
+logdir = './log/'
+
 if __name__ == "__main__":
+  if not os.path.exists(logdir):
+    print 'no logdir defined'
+    exit(-1)  
   app.run()
   '''
   g = grep('grep.txt')
