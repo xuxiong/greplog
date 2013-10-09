@@ -72,7 +72,9 @@ class grep:
     except StopIteration:
       pass	
     return lines    
-  
+'''
+credit goes to http://stackoverflow.com/questions/260273/most-efficient-way-to-search-the-last-x-lines-of-a-file-in-python/260433#260433
+'''  
 def reversed_lines(file):
     "Generate the lines of file in reverse order."
     part = ''
