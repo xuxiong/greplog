@@ -16,12 +16,10 @@ class grep:
       if offset >= 0:
         file.seek(min(size, offset))
         lines = self.grephead(file, limit, p, before, after)      
-        here = file.tell()      
       else:
         file.seek(max(-size, offset), 2)
-        here = file.tell()
-        lines = self.greptail(file, limit, p, before, after)      
-      return here, lines
+        lines = self.greptail(file, limit, p, before, after)[::-1]
+      return file.tell(), lines
   
   def grephead(self, file, limit, p, before, after):
     lines = []
@@ -46,29 +44,29 @@ class grep:
   
   def greptail(self, file, limit, p, before, after):
     lines = []
-    linesbefore = []
+    linesafter = []
     i = 0
     rlines = reversed_lines(file)
     try:
       for line in rlines:
         if i >= limit: break
         if before > 0:
-          if len(linesbefore) > before: linesbefore.pop(0)
-          linesbefore.append(line)
+          if len(linesafter) > after: linesafter.pop(0)
+          linesafter.append(line)
         if p is None or re.search(p, line): 
-          if len(linesbefore) > 1: 
-            lines.append(linesbefore[:-1])
-            linesbefore = []
+          if len(linesafter) > 1: 
+            lines.append(linesafter[:-1])
+            linesafter = []
           lines.append((i, line))
           i += 1
-          linesafter = []
+          linesbefore = []
           try:		  
-            for j in xrange(after):
+            for j in xrange(before):
               line = rlines.next()
-              linesafter.append(line)
+              linesbefore.append(line)
           except StopIteration:
             pass		  
-          if len(linesafter) > 0: lines.append(linesafter)	
+          if len(linesbefore) > 0: lines.append(linesbefore)	
     except StopIteration:
       pass	
     return lines    
