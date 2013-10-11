@@ -1,0 +1,18 @@
+$def with (stats)
+<html>
+<script>
+function unix_to_datetime(unix) {
+    var now = new Date(parseInt(unix) * 1000);
+    return now.toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+}
+</script>
+<body>
+<center>
+<table id="tb_file_list">
+<tr class="title"><th>文件名</th><th>大小(bytes)</th><th>修改时间</th></tr>
+$for stat in stats:
+  <tr><td><a href="grep?filename=$(stat[0])">$(stat[0])</a></td><td>$(stat[1])</td><td>$(stat[2])</td></tr>
+</table>
+</center>
+</body>  
+</html>  
