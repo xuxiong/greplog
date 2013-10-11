@@ -50,7 +50,7 @@ class grep:
     try:
       for line in rlines:
         if i >= limit: break
-        if before > 0:
+        if after > 0:
           if len(linesafter) > after: linesafter.pop(0)
           linesafter.append(line)
         if p is None or re.search(p, line): 
@@ -94,8 +94,10 @@ def reversed_blocks(file, blocksize=4096):
         yield file.read(delta)
         
 import web
+import datetime
 
 urls = ('/grep', 'grepHandler', '/ls', 'lsHandler')
+render = web.template.render('templates/', cache=False)
 
 class grepHandler:
   def GET(self):
@@ -109,8 +111,8 @@ class lsHandler:
     result = []
     for f in [f for f in os.listdir(logdir) if os.path.isfile(f)]:
       stat = os.stat(f)
-      result.append((f, stat[6], stat[8]))
-    return result
+      result.append((f, stat[6], datetime.datetime.fromtimestamp(stat[8]).strftime('%Y-%m-%d %H:%M:%S')))
+    return render.list(result)
           
 app = web.application(urls, globals())
 
