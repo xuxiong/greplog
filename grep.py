@@ -32,14 +32,15 @@ class grep:
         if len(linesbefore) > before: linesbefore.pop(0)
         linesbefore.append(line)
       if p is None or re.search(p, line): 
-        if len(linesbefore) > 1: 
-          lines.append(linesbefore[:-1])
-          linesbefore = []
-        lines.append((i, line))
+        match = line
         i += 1
+        linesafter = []
         for j in xrange(after):
           line = file.readline()
-          lines.append(line)
+          if line != '':
+            linesafter.append(line)
+        lines.append([linesbefore[:-1], match, linesafter])	
+        linesbefore = []		
     return lines    
   
   def greptail(self, file, limit, p, before, after):
@@ -54,19 +55,17 @@ class grep:
           if len(linesafter) > after: linesafter.pop(0)
           linesafter.append(line)
         if p is None or re.search(p, line): 
-          if len(linesafter) > 1: 
-            lines.append(linesafter[:-1])
-            linesafter = []
-          lines.append((i, line))
+          match = line		
           i += 1
           linesbefore = []
           try:		  
-            for j in xrange(before):
+            for j in xrange(before):			
               line = rlines.next()
               linesbefore.append(line)
           except StopIteration:
             pass		  
-          if len(linesbefore) > 0: lines.append(linesbefore)	
+          lines.append([linesbefore[::-1], match, linesafter[:-1][::-1]])	
+          linesafter = []		
     except StopIteration:
       pass	
     return lines    
@@ -95,6 +94,7 @@ def reversed_blocks(file, blocksize=4096):
         
 import web
 import datetime
+import json
 
 urls = ('/grep', 'grepHandler', '/ls', 'lsHandler')
 render = web.template.render('templates/', cache=False)
@@ -104,7 +104,8 @@ class grepHandler:
     req = web.input(pattern=None, offset='0', limit='10', before='0', after='0')
     if req.filename.find('/') < 0:
       g = grep(logdir+req.filename)
-      return g.greplines(offset=int(req.offset), pattern=req.pattern, limit=int(req.limit), after=int(req.after))
+      result = g.greplines(offset=int(req.offset), pattern=req.pattern, limit=int(req.limit), before=int(req.before), after=int(req.after))
+      return json.dumps(result)
 
 class lsHandler:
   def GET(self):
@@ -123,10 +124,9 @@ if __name__ == "__main__":
     print 'no logdir defined'
     exit(-1)  
   app.run()
-  '''
-  g = grep('grep.txt')
-  offset, lines = g.greplines(offset=-1, pattern='', limit=5)
-  print offset, len(lines), lines
-  offset, lines = g.greplines(offset=0, pattern='', limit=5)
+  
+  g = grep(logdir+'grep.txt')
+  #offset, lines = g.greplines(offset=-1, pattern='', limit=5)
+  #print offset, len(lines), lines
+  offset, lines = g.greplines(offset=-1, pattern='^:2', limit=4, before=2, after=2)
   print offset, len(lines), lines  
-  '''
