@@ -110,9 +110,11 @@ class grepHandler:
 class lsHandler:
   def GET(self):
     result = []
-    for f in [f for f in os.listdir(logdir) if os.path.isfile(f)]:
-      stat = os.stat(f)
-      result.append((f, stat[6], datetime.datetime.fromtimestamp(stat[8]).strftime('%Y-%m-%d %H:%M:%S')))
+    for f in os.listdir(logdir):
+      path = logdir + f	
+      if os.path.isfile(path):
+        stat = os.stat(path)
+        result.append((f, stat[6], datetime.datetime.fromtimestamp(stat[8]).strftime('%Y-%m-%d %H:%M:%S')))		
     return render.list(result)
           
 app = web.application(urls, globals())
