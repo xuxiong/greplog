@@ -105,7 +105,7 @@ class grepHandler:
     if req.filename.find('/') < 0:
       g = grep(logdir+req.filename)
       result = g.greplines(offset=int(req.offset), pattern=req.pattern, limit=int(req.limit), before=int(req.before), after=int(req.after))
-      return json.dumps(result)
+      return render.match(result, req)
 
 class lsHandler:
   def GET(self):
