@@ -1,0 +1,61 @@
+$def with(result, req)
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>日志文件查看</title>
+<style type="text/css">
+.short {width: 50px;text-align: center;}
+input,#txt_pattern {border: none;border-bottom: 1px solid grey;}
+.matchbox {padding: 1px;margin: 1px;}
+.matchbox .before {padding-bottom: 1px;}
+.matchbox .after {padding-top: 1px;}
+.matchbox .match {color: red;}
+pre{padding: 0;margin: 0;}
+</style>
+</head>
+<body>
+<div style="margin-left: 200px;">
+	<form action="grep?filename=xxx">
+		<table>
+			<tr>
+				<td>正则表达式过滤: <input name="pattern" id="txt_pattern" style="width: 300px;height: 18px;" value="$(req.pattern)"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					最多匹配条数: <input name="limit" id="txt_limit" class="short" value="$(req.limit)"/>
+				</td>
+			</tr>
+			<tr>
+				<td>同时显示:
+					前<input name="before" id="txt_before" class="short" value="$(req.before)"/>行
+					后<input name="after" id="txt_after" class="short" value="$(req.after)"/>行
+					<input name="filename" type="hidden" value="$(req.filename)" />
+					<input id="bt_query" style="float: right;" type="submit" value="查看" />
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+	<hr color="orange"/>
+	<div>
+$for r in result[1]:
+	<div class="matchbox">
+	<pre class="before">
+	$for b in r[0]:
+		$b
+	</pre>
+	<pre class="match">
+	$r[1]
+	</pre>
+	<pre class="after">
+	$for a in r[2]:
+		$a
+	</pre>
+	</div>
+	<hr/>
+	</div>
+</body>
+</html>
