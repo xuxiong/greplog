@@ -6,20 +6,22 @@ class grep:
   def __init__(self, filename):
     self.filename = filename
     
-  def greplines(self, offset=0, pattern=None, limit=10, before=0, after=0):
+  def greplines(self, offset=0, pattern=None, limit=10, before=0, after=0, forward=True):
     with open(self.filename) as file:
       size = os.path.getsize(self.filename)
       lines = []
       p = None
       if pattern:
         p = re.compile(pattern)
-      if offset >= 0:
+      if forward:
         file.seek(min(size, offset))
-        lines = self.grephead(file, limit, p, before, after)      
+        lines = self.grephead(file, limit, p, before, after)
+        offset = file.tell()      
       else:
-        file.seek(max(-size, offset), 2)
-        lines = self.greptail(file, limit, p, before, after)[::-1]
-      return file.tell(), lines
+        file.seek(max(size, offset))
+        offset, rlines = self.greptail(file, limit, p, before, after)
+        lines = rlines[::-1]
+      return offset, lines
   
   def grephead(self, file, limit, p, before, after):
     lines = []
@@ -49,7 +51,7 @@ class grep:
     i = 0
     rlines = reversed_lines(file)
     try:
-      for line in rlines:
+      for offset, line in rlines:
         if i >= limit: break
         if after > 0:
           if len(linesafter) > after: linesafter.pop(0)
@@ -60,7 +62,7 @@ class grep:
           linesbefore = []
           try:		  
             for j in xrange(before):			
-              line = rlines.next()
+              offset, line = rlines.next()
               linesbefore.append(line)
           except StopIteration:
             pass		  
@@ -68,20 +70,20 @@ class grep:
           linesafter = []		
     except StopIteration:
       pass	
-    return lines    
+    return offset, lines    
 '''
 credit goes to http://stackoverflow.com/questions/260273/most-efficient-way-to-search-the-last-x-lines-of-a-file-in-python/260433#260433
 '''  
 def reversed_lines(file):
     "Generate the lines of file in reverse order."
     part = ''
-    for block in reversed_blocks(file):
+    for offset, block in reversed_blocks(file):
         for c in reversed(block):
             if c == '\n' and part:
-                yield part[::-1]
+                yield offset, part[::-1]
                 part = ''
             part += c
-    if part: yield part[::-1]
+    if part: yield offset, part[::-1]
 
 def reversed_blocks(file, blocksize=4096):
     "Generate blocks of file's contents in reverse order."
@@ -90,7 +92,7 @@ def reversed_blocks(file, blocksize=4096):
         delta = min(blocksize, here)
         here -= delta
         file.seek(here, os.SEEK_SET)
-        yield file.read(delta)
+        yield file.tell(), file.read(delta)
         
 import web
 import datetime
@@ -101,10 +103,10 @@ render = web.template.render('templates/', cache=False)
 
 class grepHandler:
   def GET(self):
-    req = web.input(pattern=None, offset='0', limit='10', before='0', after='0')
+    req = web.input(pattern=None, offset='0', limit='10', before='0', after='0', forward='true')
     if req.filename.find('/') < 0:
       g = grep(logdir+req.filename)
-      result = g.greplines(offset=int(req.offset), pattern=req.pattern, limit=int(req.limit), before=int(req.before), after=int(req.after))
+      result = g.greplines(offset=int(req.offset), pattern=req.pattern, limit=int(req.limit), before=int(req.before), after=int(req.after), forward=req.forward.lower()=='true')
       return render.match(result, req)
 
 class lsHandler:
