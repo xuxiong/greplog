@@ -17,11 +17,11 @@ pre{padding: 0;margin: 0;}
 </head>
 <body>
 <div style="margin-left: 200px;">
-	<form action="grep?filename=xxx">
+	<form action="grep">
 		<table>
 			<tr>
-				<input type="radio" name="offset" value = "0" checked="YES">正向查找</input>
-				<input type="radio" name="offset" value="-1">反向查找</input>
+				<input type="radio" name="forward" value = "true" checked="YES">正向查找</input>
+				<input type="radio" name="forward" value="false">反向查找</input>
 			</tr>
 			<tr>
 				<td>正则表达式过滤条件: <input name="pattern" id="txt_pattern" style="width: 300px;height: 18px;" value="$(req.pattern)"/>
@@ -37,6 +37,7 @@ pre{padding: 0;margin: 0;}
 					前<input name="before" id="txt_before" class="short" value="$(req.before)"/>行
 					后<input name="after" id="txt_after" class="short" value="$(req.after)"/>行
 					<input name="filename" type="hidden" value="$(req.filename)" />
+					<input name="offset" type="hidden" value="$(result[0])" />
 					<input id="bt_query" style="float: right;" type="submit" value="查看" />
 				</td>
 			</tr>
