@@ -18,7 +18,10 @@ class grep:
         lines = self.grephead(file, limit, p, before, after)
         offset = file.tell()      
       else:
-        file.seek(max(size, offset))
+        if offset>0:
+          file.seek(min(size, offset))
+        else:
+          file.seek(size)		
         offset, rlines = self.greptail(file, limit, p, before, after)
         lines = rlines[::-1]
       return offset, lines
@@ -50,8 +53,10 @@ class grep:
     linesafter = []
     i = 0
     rlines = reversed_lines(file)
+    pos = -1	
     try:
       for offset, line in rlines:
+        pos = offset	  
         if i >= limit: break
         if after > 0:
           if len(linesafter) > after: linesafter.pop(0)
@@ -70,7 +75,7 @@ class grep:
           linesafter = []		
     except StopIteration:
       pass	
-    return offset, lines    
+    return pos, lines    
 '''
 credit goes to http://stackoverflow.com/questions/260273/most-efficient-way-to-search-the-last-x-lines-of-a-file-in-python/260433#260433
 '''  
