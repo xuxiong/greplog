@@ -11,7 +11,7 @@ input,#txt_pattern {border: none;border-bottom: 1px solid grey;}
 .matchbox {padding: 1px;margin: 1px;}
 .matchbox .before {padding-bottom: 1px;}
 .matchbox .after {padding-top: 1px;}
-.matchbox .match {color: red;}
+.matchbox .match {color: black;font-weight: bold;}
 pre{padding: 0;margin: 0;}
 </style>
 </head>
@@ -20,7 +20,7 @@ pre{padding: 0;margin: 0;}
 	<form action="grep">
 		<table>
 			<tr>
-				<input type="radio" name="forward" value = "true" checked="YES">正向查找</input>
+				<input type="radio" name="forward" value = "true">正向查找</input>
 				<input type="radio" name="forward" value="false">反向查找</input>
 			</tr>
 			<tr>
@@ -37,7 +37,7 @@ pre{padding: 0;margin: 0;}
 					前<input name="before" id="txt_before" class="short" value="$(req.before)"/>行
 					后<input name="after" id="txt_after" class="short" value="$(req.after)"/>行
 					<input name="filename" type="hidden" value="$(req.filename)" />
-					<input name="offset" type="hidden" value="$(result[0])" />
+					<!--input name="offset" type="hidden" value="$(result[0])" /-->
 					<input id="bt_query" style="float: right;" type="submit" value="查看" />
 				</td>
 			</tr>
