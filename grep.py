@@ -33,6 +33,7 @@ class grep:
     while i < limit:
       line = file.readline()
       if line == '': break
+      line = force_decode(line)	  
       if before > 0:
         if len(linesbefore) > before: linesbefore.pop(0)
         linesbefore.append(line)
@@ -43,6 +44,7 @@ class grep:
         for j in xrange(after):
           line = file.readline()
           if line != '':
+            line = force_decode(line)		  
             linesafter.append(line)
         lines.append([linesbefore[:-1], match, linesafter])	
         linesbefore = []		
@@ -60,6 +62,7 @@ class grep:
         if i >= limit: break
         if after > 0:
           if len(linesafter) > after: linesafter.pop(0)
+          line = force_decode(line)
           linesafter.append(line)
         if p is None or re.search(p, line): 
           match = line		
@@ -68,6 +71,7 @@ class grep:
           try:		  
             for j in xrange(before):			
               offset, line = rlines.next()
+              line = force_decode(line)			  
               linesbefore.append(line)
           except StopIteration:
             pass		  
@@ -99,6 +103,13 @@ def reversed_blocks(file, blocksize=4096):
         file.seek(here, os.SEEK_SET)
         yield file.tell(), file.read(delta)
         
+def force_decode(string, codecs=['utf8', 'gbk']):
+    for i in codecs:
+        try:
+            return string.decode(i)
+        except:
+            pass
+		
 import web
 import datetime
 import json
