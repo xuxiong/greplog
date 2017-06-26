@@ -31,6 +31,8 @@ def combine(filename):
             if j < n:
                 reqs.append({'time':time, \
                              'host': '%s:%d' % (dest, destport), \
+                             'iRTT': data.iloc[j].iRTT, \
+                             'length': data.iloc[j].ContentLength, \
                              'request':url, 'duration':data.iloc[j].Time - time, \
                              'status':data.iloc[j].info})
             while j+1 < n and \
