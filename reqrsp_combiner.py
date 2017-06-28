@@ -4,7 +4,10 @@ Created on Wed Jun 21 15:35:48 2017
 
 @author: xux
 """
-
+import matplotlib.pyplot as plt
+plt.rcParams['font.sans-serif']=['SimHei'] #用来正常显示中文标签
+plt.rcParams['axes.unicode_minus']=False #用来正常显示负号
+#有中文出现的情况，需要u'内容'
 import pandas as pd
 
 def combine(filename):      
@@ -47,10 +50,10 @@ def combine(filename):
 
 def plot(df):
     ax = df[['time', 'duration']].plot.barh(stacked=True, colormap='Paired', figsize=(10,15), xlim=(df.iloc[0].time, df.iloc[-1].time+df.iloc[-1].duration), grid=True)
-#    ax.set_title(u'请求响应时间分析')
-#    ax.set_ylable(u'请求序号')
-#    ax.set_xlabel(u'时间')
-#    ax.xaxis.set_ticks_position('both')
+    ax.set_title(u'HTTP请求响应时间分析')
+    ax.set_ylabel(u'请求序号')
+    ax.set_xlabel(u'时间')
+    ax.xaxis.set_ticks_position('both')
     return ax
 
 if __name__ == '__main__':
