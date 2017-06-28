@@ -61,12 +61,11 @@ def plot(df, title=u'HTTP请求响应时间分析', figsize=(10,15), interval=No
     ax.xaxis.set_ticks_position('both')
     if interval:
         i, N = 0, len(df)
-        last = -1
+        facecolor = 'g'
         while i+1 < N:
             if df.iloc[i+1].time - df.iloc[i].time > interval:
-                if i != last:
-                    ax.axvspan(df.iloc[i].time, df.iloc[i+1].time, facecolor='g', edgecolor='none', alpha=.2)
-                last = i+1
+                facecolor = 'b' if facecolor == 'g' else 'g'
+                ax.axvspan(df.iloc[i].time, df.iloc[i+1].time, facecolor=facecolor, edgecolor='none', alpha=.1)
             i += 1
     return ax
 
