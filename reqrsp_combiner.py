@@ -65,8 +65,7 @@ def plot(df, title=u'HTTP请求响应时间分析', figsize=(10,15), interval=No
         while i+1 < N:
             if df.iloc[i+1].time - df.iloc[i].time > interval:
                 if i != last:
-                    ax.axvline(x=df.iloc[i].time)
-                ax.axvline(x=df.iloc[i+1].time)
+                    ax.axvspan(df.iloc[i].time, df.iloc[i+1].time, facecolor='g', edgecolor='none', alpha=.2)
                 last = i+1
             i += 1
     return ax
