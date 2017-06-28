@@ -46,14 +46,29 @@ def combine(filename):
         i += 1
     
     df = pd.DataFrame(reqs)
+    df['end'] = df.time + df.duration
     return df
 
-def plot(df, title=u'HTTP请求响应时间分析', figsize=(10,15)):
-    ax = df[['time', 'duration']].plot.barh(stacked=True, colormap='Paired', figsize=figsize, xlim=(df.iloc[0].time, df.iloc[-1].time+df.iloc[-1].duration), grid=True)
+def plot(df, title=u'HTTP请求响应时间分析', figsize=(10,15), interval=None):
+    ax = df[['time', 'duration']].plot.barh(stacked=True, \
+           colormap='Paired', \
+           figsize=figsize, \
+           xlim=(df.iloc[0].time, df.iloc[-1].time+df.iloc[-1].duration), \
+           grid=True)
     ax.set_title(title)
     ax.set_ylabel(u'请求序号')
     ax.set_xlabel(u'时间(秒)')
     ax.xaxis.set_ticks_position('both')
+    if interval:
+        i, N = 0, len(df)
+        last = -1
+        while i+1 < N:
+            if df.iloc[i+1].time - df.iloc[i].time > interval:
+                if i != last:
+                    ax.axvline(x=df.iloc[i].time)
+                ax.axvline(x=df.iloc[i+1].time)
+                last = i+1
+            i += 1
     return ax
 
 if __name__ == '__main__':
