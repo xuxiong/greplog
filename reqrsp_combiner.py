@@ -48,11 +48,11 @@ def combine(filename):
     df = pd.DataFrame(reqs)
     return df
 
-def plot(df):
-    ax = df[['time', 'duration']].plot.barh(stacked=True, colormap='Paired', figsize=(10,15), xlim=(df.iloc[0].time, df.iloc[-1].time+df.iloc[-1].duration), grid=True)
-    ax.set_title(u'HTTP请求响应时间分析')
+def plot(df, title=u'HTTP请求响应时间分析', figsize=(10,15)):
+    ax = df[['time', 'duration']].plot.barh(stacked=True, colormap='Paired', figsize=figsize, xlim=(df.iloc[0].time, df.iloc[-1].time+df.iloc[-1].duration), grid=True)
+    ax.set_title(title)
     ax.set_ylabel(u'请求序号')
-    ax.set_xlabel(u'时间')
+    ax.set_xlabel(u'时间(秒)')
     ax.xaxis.set_ticks_position('both')
     return ax
 
