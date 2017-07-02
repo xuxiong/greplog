@@ -10,18 +10,18 @@ plt.rcParams['axes.unicode_minus']=False #用来正常显示负号
 #有中文出现的情况，需要u'内容'
 import pandas as pd
 
-def combine(filename):      
+def combine(filename, clientips=[]):      
     data = pd.read_csv(filename)
     
     reqs = []
     i, j = 0, 0
     n = len(data)
-    clientip = None
+    clientips = set(clientips)
     while i < n:
-        if not clientip:
+        if len(clientips) == 0:
             if data.iloc[i].info.startswith('GET ') or data.iloc[i].info.startswith('POST '):
-                clientip = data.iloc[i].Source
-        if data.iloc[i].Source == clientip:
+                clientips.add(data.iloc[i].Source)
+        if data.iloc[i].Source in clientips:
             time, url, srcport, source = data.iloc[i].Time, data.iloc[i].info, data.iloc[i].srcport, data.iloc[i].Source
             dest, destport = data.iloc[i].Destination, data.iloc[i].destport
             j = i + 1
@@ -75,3 +75,9 @@ if __name__ == '__main__':
 
 #df = df.iloc[::-1]
 #df[['time', 'duration']].plot.barh(stacked=True, colormap='Paired', figsize=(10,15), xlim=(df.iloc[0].time, df.iloc[-1].time+df.iloc[-1].duration))
+
+'''
+rtt = pd.concat([df1.iRTT, df2.iRTT, df3.iRTT, df4.iRTT, df5.iRTT, df6.iRTT, df7.iRTT, df8.iRTT, df9.iRTT, df10.iRTT, df11.iRTT, df12.iRTT], axis=1, keys=['dhcp1','dhcp2', 'dhcp3', 'dhcp4', 'dhcp5', 'dhcp6', 'ppoe1', 'ppoe2', 'ppoe3', 'ppoe4', 'ppoe5', 'ppoe6'])
+ax = rtt.boxplot()
+ax.set_title(u'网络往返时间分布')
+'''
