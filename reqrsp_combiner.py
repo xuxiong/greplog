@@ -36,7 +36,9 @@ def combine(filename, clientips=[]):
                              'host': '%s:%d' % (dest, destport), \
                              'iRTT': data.iloc[j].iRTT, \
                              'length': data.iloc[j].ContentLength, \
-                             'request':url, 'duration':data.iloc[j].Time - time, \
+                             'request':url, \
+                             'duration':data.iloc[j].Time - time, \
+                             'resptime':data.iloc[j].responseTime, \
                              'status':data.iloc[j].info})
             while j+1 < n and \
                 data.iloc[j+1].Source == data.iloc[j].Source and \
@@ -49,9 +51,10 @@ def combine(filename, clientips=[]):
     df['end'] = df.time + df.duration
     return df
 
-def plot(df, title=u'HTTP请求响应时间分析', figsize=(10,15), interval=None):
+def plot(df, title=u'HTTP请求响应时间分析', figsize=(10,15), interval=None, labels=None):
     ax = df[['time', 'duration']].plot.barh(stacked=True, \
-           colormap='Paired', \
+           #colormap='Paired', \
+           color=['w','r'], \
            figsize=figsize, \
            xlim=(df.iloc[0].time, df.iloc[-1].time+df.iloc[-1].duration), \
            grid=True)
@@ -59,6 +62,8 @@ def plot(df, title=u'HTTP请求响应时间分析', figsize=(10,15), interval=No
     ax.set_ylabel(u'请求序号')
     ax.set_xlabel(u'时间(秒)')
     ax.xaxis.set_ticks_position('both')
+    if labels:
+        ax.legend(labels=labels)
     if interval:
         i, N = 0, len(df)
         facecolor = 'g'
@@ -77,7 +82,23 @@ if __name__ == '__main__':
 #df[['time', 'duration']].plot.barh(stacked=True, colormap='Paired', figsize=(10,15), xlim=(df.iloc[0].time, df.iloc[-1].time+df.iloc[-1].duration))
 
 '''
-rtt = pd.concat([df1.iRTT, df2.iRTT, df3.iRTT, df4.iRTT, df5.iRTT, df6.iRTT, df7.iRTT, df8.iRTT, df9.iRTT, df10.iRTT, df11.iRTT, df12.iRTT], axis=1, keys=['dhcp1','dhcp2', 'dhcp3', 'dhcp4', 'dhcp5', 'dhcp6', 'ppoe1', 'ppoe2', 'ppoe3', 'ppoe4', 'ppoe5', 'ppoe6'])
-ax = rtt.boxplot()
-ax.set_title(u'网络往返时间分布')
+df1 = reqrsp.combine(u'越秀南抓包测试/点播-电影/1.csv')
+df2 = reqrsp.combine(u'越秀南抓包测试/点播-电影/2.csv')
+df3 = reqrsp.combine(u'越秀南抓包测试/点播-电影/3.csv')
+df4 = reqrsp.combine(u'越秀南抓包测试/推荐-直播-点播-精品/1.csv')
+df5 = reqrsp.combine(u'越秀南抓包测试/推荐-直播-点播-精品/2.csv')
+df6 = reqrsp.combine(u'越秀南抓包测试/推荐-直播-点播-精品/3.csv')
+df10 = reqrsp.combine(u'越秀南抓包测试/ppoe_20170629/ppoe1.csv')
+df11 = reqrsp.combine(u'越秀南抓包测试/ppoe_20170629/ppoe2.csv')
+df12 = reqrsp.combine(u'越秀南抓包测试/ppoe_20170629/ppoe3.csv')
+
+dhcp = pd.concat([df1, df2, df3, df4, df5, df6])
+ppoe = pd.concat([df10, df11, df12])
+
+ppoetime = pd.read_csv(u'越秀南抓包测试/ppoe_20170629/ppoe1.csv', usecols=[7,9])
+ppoetime = ppoetime.append(pd.read_csv(u'越秀南抓包测试/ppoe_20170629/ppoe2.csv', usecols=[7,9]), ignore_index=True)
+ppoetime = ppoetime.append(pd.read_csv(u'越秀南抓包测试/ppoe_20170629/ppoe3.csv', usecols=[7,9]), ignore_index=True)
+ppoetime.describe()
+
+responsetime = pd.concat([dhcptime, ppoetime], keys=['DHCP', 'PPPoE'], axis=1)
 '''
