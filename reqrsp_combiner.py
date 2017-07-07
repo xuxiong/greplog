@@ -101,4 +101,7 @@ ppoetime = ppoetime.append(pd.read_csv(u'越秀南抓包测试/ppoe_20170629/ppo
 ppoetime.describe()
 
 responsetime = pd.concat([dhcptime, ppoetime], keys=['DHCP', 'PPPoE'], axis=1)
+
+df = pd.read_csv('/data1/localhost_access_log.2017-06-21.txt', sep=r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)(?![^\[]*\])', engine='python', header=None, usecols=[0,6,7,11], names=['ip','date','ts','time'], parse_dates=[[1,2]], date_parser=pd.datetools.to_datetime)
+df.set_index('date_ts', inplace=True)
 '''
